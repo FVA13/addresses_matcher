@@ -6,7 +6,7 @@ import streamlit as st
 from Levenshtein import distance as lev_distance
 
 
-@st.cache_data
+# @st.cache_data
 def get_best_matches(query, top_n, embeddings: np.array, sentences, model):
     if model != "Advanced":
         model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
@@ -24,8 +24,8 @@ def get_best_matches(query, top_n, embeddings: np.array, sentences, model):
         best_matches['lev_distance'] = best_matches['lev_distance'].astype('int')
         if len(best_matches[best_matches['scores'] >= 0.99]):
             return best_matches[best_matches['scores'] >= 0.99]
-        elif len(best_matches[best_matches['scores'] >= 0.90]):
-            return best_matches[best_matches['scores'] >= 0.90]
+        elif len(best_matches[best_matches['scores'] >= 0.97]):
+            return best_matches[best_matches['scores'] >= 0.97]
         elif len(best_matches[best_matches['scores'] >= 0.90]):
             return best_matches[best_matches['scores'] >= 0.90]
         else:
@@ -49,16 +49,16 @@ def get_best_matches(query, top_n, embeddings: np.array, sentences, model):
         # add catboost here to assess probabilities
         if len(best_matches[best_matches['scores'] >= 0.99]):
             return best_matches[best_matches['scores'] >= 0.99]
-        elif len(best_matches[best_matches['scores'] >= 0.90]):
-            return best_matches[best_matches['scores'] >= 0.90]
+        elif len(best_matches[best_matches['scores'] >= 0.97]):
+            return best_matches[best_matches['scores'] >= 0.97]
         elif len(best_matches[best_matches['scores'] >= 0.90]):
             return best_matches[best_matches['scores'] >= 0.90]
         else:
             return best_matches
 
 
-def multiple_best_matches(file, top_n, embeddings: np.array, sentences):
+def multiple_best_matches(file, top_n, embeddings: np.array, sentences, model):
     res = pd.DataFrame()
     for el in file:
-        res = pd.concat([res, get_best_matches(el, top_n, embeddings, sentences)])
+        res = pd.concat([res, get_best_matches(el, top_n, embeddings, sentences, model)])
     return res.reset_index(drop=True)

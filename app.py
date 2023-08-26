@@ -16,7 +16,6 @@ def main():
     query = st.text_input("Enter some text")
     file_uploaded = st.file_uploader("File uploader", type=["csv"])
     calculate = st.button("Fetch Matches")
-    # add file upload
     model_chosen = st.selectbox("Select Option Model", ["Basic", "Advanced"])
     with open("data/processed/embeddings.pkl", "rb") as f:
         embeddings = pickle.load(f)
@@ -27,10 +26,11 @@ def main():
         with st.spinner(text="In progress"):
             if file_uploaded:
                 prediction = multiple_best_matches(
-                    file=file_uploaded.value,
-                    top_n=10,
+                    file=pd.read_csv(file_uploaded, index_col=0).values,
+                    top_n=1,
                     embeddings=np.array(embeddings),
                     sentences=for_embeddings,
+                    model=model_chosen,
                 )
             else:
                 prediction = get_best_matches(
