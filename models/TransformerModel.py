@@ -22,8 +22,10 @@ def get_best_matches(query, top_n, embeddings: np.array, sentences, model):
                                                                                     ascending=False).reset_index(drop=True)
         best_matches['scores'] = best_matches['scores'].apply(lambda x: round(x, 3))
         best_matches['lev_distance'] = best_matches['lev_distance'].astype('int')
-        if len(best_matches[best_matches['scores'] >= 0.98]):
-            return best_matches[best_matches['scores'] >= 0.98]
+        if len(best_matches[best_matches['scores'] >= 0.99]):
+            return best_matches[best_matches['scores'] >= 0.99]
+        elif len(best_matches[best_matches['scores'] >= 0.90]):
+            return best_matches[best_matches['scores'] >= 0.90]
         elif len(best_matches[best_matches['scores'] >= 0.90]):
             return best_matches[best_matches['scores'] >= 0.90]
         else:
@@ -45,9 +47,18 @@ def get_best_matches(query, top_n, embeddings: np.array, sentences, model):
 
         # add logic to topn selection
         # add catboost here to assess probabilities
-        if len(best_matches[best_matches['scores'] >= 0.98]):
-            return best_matches[best_matches['scores'] >= 0.98]
+        if len(best_matches[best_matches['scores'] >= 0.99]):
+            return best_matches[best_matches['scores'] >= 0.99]
+        elif len(best_matches[best_matches['scores'] >= 0.90]):
+            return best_matches[best_matches['scores'] >= 0.90]
         elif len(best_matches[best_matches['scores'] >= 0.90]):
             return best_matches[best_matches['scores'] >= 0.90]
         else:
             return best_matches
+
+
+def multiple_best_matches(file, top_n, embeddings: np.array, sentences):
+    res = pd.DataFrame()
+    for el in file:
+        res = pd.concat([res, get_best_matches(el, top_n, embeddings, sentences)])
+    return res.reset_index(drop=True)

@@ -2,7 +2,7 @@ import streamlit as st
 import pickle
 import pandas as pd
 import numpy as np
-from models.TransformerModel import get_best_matches
+from models.TransformerModel import get_best_matches, multiple_best_matches
 
 st.set_page_config(
     page_title="Find the best Matching Addresses",
@@ -14,6 +14,7 @@ st.set_page_config(
 
 def main():
     query = st.text_input("Enter some text")
+    file_uploaded = st.file_uploader("File uploader", type=["csv"])
     calculate = st.button("Fetch Matches")
     # add file upload
     model_chosen = st.selectbox("Select Option Model", ["Basic", "Advanced"])
@@ -24,13 +25,21 @@ def main():
     if calculate is True:
         st.spinner()
         with st.spinner(text="In progress"):
-            prediction = get_best_matches(
-                query=query,
-                top_n=10,
-                embeddings=np.array(embeddings),
-                sentences=for_embeddings,
-                model=model_chosen,
-            )
+            if file_uploaded:
+                prediction = multiple_best_matches(
+                    file=file_uploaded.value,
+                    top_n=10,
+                    embeddings=np.array(embeddings),
+                    sentences=for_embeddings,
+                )
+            else:
+                prediction = get_best_matches(
+                    query=query,
+                    top_n=10,
+                    embeddings=np.array(embeddings),
+                    sentences=for_embeddings,
+                    model=model_chosen,
+                )
             st.table(prediction)
             st.success("Done")
 
