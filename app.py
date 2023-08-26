@@ -1,12 +1,7 @@
-from sklearn.datasets import make_classification
 import streamlit as st
-
-# from utils import *
-# import lightning as L
 import pickle
 import pandas as pd
 import numpy as np
-
 from models.TransformerModel import get_best_matches
 
 st.set_page_config(
@@ -21,18 +16,20 @@ def main():
     query = st.text_input("Enter some text")
     calculate = st.button("Fetch Matches")
     # add file upload
-    with open("notebooks/embeddings_list.pkl", "rb") as f:
-        embeddings_list = pickle.load(f)
+    model_chosen = st.selectbox("Select Option Model", ["Basic", "Advanced"])
+    with open("data/processed/embeddings.pkl", "rb") as f:
+        embeddings = pickle.load(f)
 
-    train_emb_only = pd.read_pickle("notebooks/names_embeddings_list.pkl")
+    for_embeddings = pd.read_pickle("data/processed/for_embeddings_with_names.pkl")
     if calculate is True:
         st.spinner()
         with st.spinner(text="In progress"):
             prediction = get_best_matches(
                 query=query,
-                top_n=5,
-                embeddings=np.array(embeddings_list),
-                embeddings_decoding=train_emb_only,
+                top_n=10,
+                embeddings=np.array(embeddings),
+                sentences=for_embeddings,
+                model=model_chosen,
             )
             st.table(prediction)
             st.success("Done")
